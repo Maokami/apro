@@ -1,0 +1,3 @@
+[submodule "gloro"]
+	path = gloro
+	url = git@github.com:klasleino/gloro.git
