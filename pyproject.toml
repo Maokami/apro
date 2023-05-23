@@ -6,8 +6,12 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">= 3.8, <3.10"
 gloro = { path = "./gloro/" }
+tensorflow = "^2.12.0"
+tensorflow-datasets = "^4.9.2"
+protobuf = "^3.20.0"
+keras = "^2.12.0"
 
 
 [build-system]
