@@ -10,6 +10,7 @@ from gloro.layers import ReLU as GloroReLU
 from tensorflow.keras.layers import Lambda as KerasLambda
 
 from apro.layers.base import AproLayer
+from apro.layers.approx import ReLU_approx
 
 import math
 
@@ -116,7 +117,8 @@ class ApproxReLU(KerasLambda, AproLayer):
 
     # TODO
     def relu_approx(self, x):
-        return tf.where(x >= 0, x, self.alpha * x)
+        relu_dict = {"alpha": self.alpha, "B": self.B}
+        return ReLU_approx(x, relu_dict)
 
     def lipschitz(self):
         return 1.0
