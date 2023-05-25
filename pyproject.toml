@@ -12,6 +12,7 @@ tensorflow = "^2.12.0"
 tensorflow-datasets = "^4.9.2"
 protobuf = "^3.20.0"
 keras = "^2.12.0"
+scriptify = "^0.0.1"
 
 
 [build-system]

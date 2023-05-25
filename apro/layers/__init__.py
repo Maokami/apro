@@ -1,3 +1,5 @@
+from tensorflow.keras.layers import Input
+
 from apro.layers.base import AproLayer
 from apro.layers.gloro import AveragePooling2D
 from apro.layers.gloro import Conv2D

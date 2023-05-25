@@ -10,7 +10,7 @@ from gloro.layers import ReLU as GloroReLU
 from tensorflow.keras.layers import Lambda as KerasLambda
 
 from apro.layers.base import AproLayer
-from apro.layers.approx import ReLU_approx
+from apro.approximation import ReLU_approx
 
 import math
 
