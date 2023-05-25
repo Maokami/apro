@@ -45,6 +45,8 @@ def train_apro(
     lr_schedule="fixed",
     trades_schedule=None,
     verbose=True,
+    save_to=None,
+    load_from=None,
 ):
     _print = print_if_verbose(verbose)
 
@@ -82,21 +84,35 @@ def train_apro(
     # Compile and train the model.
     _print("compiling model...")
 
-    g.compile(
-        loss=losses.get(loss),
-        optimizer=get_optimizer(optimizer, lr),
-        metrics=[clean_acc, vra, rejection_rate],
-    )
-    g.fit(
-        train,
-        epochs=epochs,
-        validation_data=test,
-        callbacks=[
-            EpsilonScheduler(epsilon_schedule),
-            LrScheduler(lr_schedule),
-        ]
-        + ([TradesScheduler(trades_schedule)] if trades_schedule else []),
-    )
+    if load_from:
+        g.f.load_weights(load_from)
+        # Compile and train the model.
+        _print("compiling model...")
+
+        g.compile(
+            loss=losses.get(loss),
+            optimizer=get_optimizer(optimizer, lr),
+            metrics=[clean_acc, vra, rejection_rate],
+        )
+
+    else:
+        g.compile(
+            loss=losses.get(loss),
+            optimizer=get_optimizer(optimizer, lr),
+            metrics=[clean_acc, vra, rejection_rate],
+        )
+        g.fit(
+            train,
+            epochs=epochs,
+            validation_data=test,
+            callbacks=[
+                EpsilonScheduler(epsilon_schedule),
+                LrScheduler(lr_schedule),
+            ]
+            + ([TradesScheduler(trades_schedule)] if trades_schedule else []),
+        )
+    if save_to:
+        g.f.save_weights(save_to)
 
     return g
 
