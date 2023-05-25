@@ -27,7 +27,7 @@ class Dense(GloroDense, AproLayer):
     def bound(self, input_bound):
         lc = self.lipschitz_inf()
         lower_bound, upper_bound = input_bound
-        return (lower_bound * lc, upper_bound * lc)
+        return (lower_bound * lc + self.bias, upper_bound * lc + self.bias)
 
 
 class Conv2D(GloroConv2D, AproLayer):
@@ -134,6 +134,6 @@ class ApproxReLU(KerasLambda, AproLayer):
 
     def bound(self, input_bound):
         lower_bound, upper_bound = input_bound
-        B = math.ceil(max(abs(lower_bound), abs(upper_bound)))
+        B = tf.reduce_max(abs(lower_bound), abs(upper_bound))
         self.set_B(B)
         return (0, upper_bound)

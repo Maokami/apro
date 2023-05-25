@@ -56,7 +56,6 @@ class AproNet(GloroNet):
         return error
 
     def compute_bound(self):
-        bound = (-1, 1)
+        bound = (-1.0, 1.0)
         for layer in self.f.layers[1:-1]:
             bound = layer.bound(bound)
-            print(bound)

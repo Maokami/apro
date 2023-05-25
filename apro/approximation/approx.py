@@ -3,6 +3,12 @@
 import tensorflow as tf
 import numpy as np
 
+import os
+
+current_file_path = os.path.abspath(__file__)
+current_dir_path = os.path.dirname(current_file_path)
+deg_dir = os.path.join(current_dir_path, "degreeResult")
+coeff_dir = os.path.join(current_dir_path, "coeffResult")
 
 class rangeException(Exception):
     def __init__(self, type, val):
@@ -45,19 +51,25 @@ def sgn_approx(x, relu_dict):
     B = relu_dict["B"]
 
     # Get degrees
-    f = open("./degreeResult/deg_" + str(alpha) + ".txt")
+    f = open(deg_dir + "/" + "deg_" + str(alpha) + ".txt")
     readed = f.readlines()
     comp_deg = [int(i) for i in readed]
 
     # Get coefficients
-    f = open("./coeffResult/coeff_" + str(alpha) + ".txt")
+    f = open(coeff_dir + "/" + "coeff_" + str(alpha) + ".txt")
     coeffs_all_str = f.readlines()
     coeffs_all = [np.float32(i) for i in coeffs_all_str]
     i = 0
 
-    if tf.reduce_sum(tf.cast(tf.abs(x) > B, tf.int32)) != 0:
-        max_val = tf.reduce_max(tf.abs(x))
-        raise rangeException("relu", max_val)
+    #if tf.reduce_sum(tf.cast(tf.abs(x) > B, tf.int32)) != 0:
+    #    max_val = tf.reduce_max(tf.abs(x))
+    #    raise rangeException("relu", max_val)
+    if tf.executing_eagerly():
+        condition = tf.reduce_sum(tf.cast(tf.abs(x) > B, tf.int32)) != 0
+        if condition:
+            max_val = tf.reduce_max(tf.abs(x))
+            raise rangeException("relu", max_val)
+
 
     x = x / B
 
@@ -70,5 +82,7 @@ def sgn_approx(x, relu_dict):
 
 
 def ReLU_approx(x, relu_dict):
+    tf.config.experimental_run_functions_eagerly(True)
+
     sgnx = sgn_approx(x, relu_dict)
     return x * (tf.constant(1.0, dtype=tf.float32) + sgnx) / 2

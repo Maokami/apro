@@ -5,6 +5,7 @@ from apro.layers import Flatten
 from apro.layers import Input
 from apro.layers import ReLU
 from apro.layers import MaxPooling2D
+from apro.layers import ApproxReLU
 
 
 def Activation(activation_type="relu"):
@@ -43,6 +44,38 @@ def cnn_2C2F(
     z = Flatten()(z)
     z = Dense(100, kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
+
+    y = Dense(num_classes, kernel_initializer=initialization)(z)
+
+    return x, y
+
+def approx_cnn_2C2F(
+    input_shape,
+    num_classes,
+    initialization="orthogonal",
+):
+    x = Input(input_shape)
+    z = Conv2D(
+        16,
+        4,
+        strides=2,
+        padding="same",
+        kernel_initializer=initialization,
+    )(x)
+    z = ApproxReLU(7,2)(z)
+
+    z = Conv2D(
+        32,
+        4,
+        strides=2,
+        padding="same",
+        kernel_initializer=initialization,
+    )(z)
+    z = ApproxReLU(7,8)(z)
+
+    z = Flatten()(z)
+    z = Dense(100, kernel_initializer=initialization)(z)
+    z = ApproxReLU(7,80)(z)
 
     y = Dense(num_classes, kernel_initializer=initialization)(z)
 
