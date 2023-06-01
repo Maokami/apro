@@ -10,12 +10,32 @@ from gloro.layers import ReLU as GloroReLU
 from tensorflow.keras.layers import Lambda as KerasLambda
 
 from apro.layers.base import AproLayer
-from apro.approximation import ReLU_approx
+from apro.approximation import ReLU_approx, rangeException
 
 import math
+import numpy as np
+
+import warnings
 
 
 class Dense(GloroDense, AproLayer):
+    def __init__(self, *args, B=None, **kwargs):
+        self.B = B
+        super().__init__(*args, **kwargs)
+
+    def call(self, inputs):
+        if self.B is not None:
+            condition = tf.reduce_sum(tf.cast(tf.abs(inputs) > self.B, tf.int32)) != 0
+            max_val = tf.norm(inputs, ord=np.inf)
+            tf.print(
+                tf.where(
+                    condition,
+                    f"Dense: max_val ({max_val}) exceeds B ({self.B})",
+                    "",
+                )
+            )
+        return super().call(inputs)
+
     def lipschitz_inf(self):
         w = self.kernel
         lc = tf.reduce_max(tf.reduce_sum(tf.abs(w), axis=1, keepdims=False))
@@ -24,13 +44,31 @@ class Dense(GloroDense, AproLayer):
     def propagate_error(self, error):
         return self.lipschitz_inf() * error
 
-    def bound(self, input_bound):
+    def bound(self, input_B):
         lc = self.lipschitz_inf()
-        lower_bound, upper_bound = input_bound
-        return (lower_bound * lc + self.bias, upper_bound * lc + self.bias)
+        bias = self.get_weights()[1]
+        b = tf.reduce_max(abs(bias))
+        return input_B * lc + b
 
 
 class Conv2D(GloroConv2D, AproLayer):
+    def __init__(self, *args, B=None, **kwargs):
+        self.B = B
+        super().__init__(*args, **kwargs)
+
+    def call(self, inputs):
+        if self.B is not None:
+            condition = tf.reduce_sum(tf.cast(tf.abs(inputs) > self.B, tf.int32)) != 0
+            max_val = tf.norm(inputs, ord=np.inf)
+            tf.print(
+                tf.where(
+                    condition,
+                    f"Conv: max_val ({max_val}) exceeds B ({self.B})",
+                    "",
+                )
+            )
+        return super().call(inputs)
+
     def lipschitz_inf(self):
         w = self.kernel
         lc = tf.reduce_max(tf.reduce_sum(tf.abs(w), axis=[0, 1, 2], keepdims=False))
@@ -40,14 +78,14 @@ class Conv2D(GloroConv2D, AproLayer):
         return self.lipschitz_inf() * error
 
     # TODO: bias
-    def bound(self, input_bound):
+    def bound(self, input_B):
         lc = self.lipschitz_inf()
-        lower_bound, upper_bound = input_bound
-        return (lower_bound * lc, upper_bound * lc)
+        bias = self.get_weights()[1]
+        b = tf.reduce_max(abs(bias))
+        return input_B * lc + b
 
 
 class AveragePooling2D(GloroAveragePooling2D, AproLayer):
-    # TODO : input_shape
     def lipschitz_inf(self):
         w = (
             tf.eye(self.input.shape[-1])[None, None]
@@ -61,8 +99,8 @@ class AveragePooling2D(GloroAveragePooling2D, AproLayer):
     def propagate_error(self, error):
         return self.lipschitz_inf() * error
 
-    def bound(self, input_bound):
-        return input_bound
+    def bound(self, input_B):
+        return input_B
 
 
 class Flatten(GloroFlatten, AproLayer):
@@ -72,8 +110,8 @@ class Flatten(GloroFlatten, AproLayer):
     def propagate_error(self, error):
         return error
 
-    def bound(self, input_bound):
-        return input_bound
+    def bound(self, input_B):
+        return input_B
 
 
 # TODO
@@ -84,8 +122,8 @@ class MaxPooling2D(GloroMaxPooling2D, AproLayer):
     def propagate_error(self, error):
         return error
 
-    def bound(self, input_bound):
-        return input_bound
+    def bound(self, input_B):
+        return input_B
 
 
 class ReLU(GloroReLU, AproLayer):
@@ -95,9 +133,8 @@ class ReLU(GloroReLU, AproLayer):
     def propagate_error(self, error):
         return error
 
-    def bound(self, input_bound):
-        _, upper_bound = input_bound
-        return (0, upper_bound)
+    def bound(self, input_B):
+        return input_B
 
 
 class ApproxReLU(KerasLambda, AproLayer):
@@ -132,8 +169,5 @@ class ApproxReLU(KerasLambda, AproLayer):
     def propagate_error(self, error):
         return error + self.approx_error()
 
-    def bound(self, input_bound):
-        lower_bound, upper_bound = input_bound
-        B = tf.reduce_max(abs(lower_bound), abs(upper_bound))
-        self.set_B(B)
-        return (0, upper_bound)
+    def bound(self, input_B):
+        return input_B

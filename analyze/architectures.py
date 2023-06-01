@@ -49,33 +49,37 @@ def cnn_2C2F(
 
     return x, y
 
+
 def approx_cnn_2C2F(
     input_shape,
     num_classes,
     initialization="orthogonal",
+    B_list=[],
 ):
     x = Input(input_shape)
     z = Conv2D(
         16,
         4,
+        B=B_list[0],
         strides=2,
         padding="same",
         kernel_initializer=initialization,
     )(x)
-    z = ApproxReLU(7,2)(z)
+    z = ApproxReLU(7, B_list[1])(z)
 
     z = Conv2D(
         32,
         4,
+        B=B_list[2],
         strides=2,
         padding="same",
         kernel_initializer=initialization,
     )(z)
-    z = ApproxReLU(7,8)(z)
+    z = ApproxReLU(7, B_list[3])(z)
 
     z = Flatten()(z)
-    z = Dense(100, kernel_initializer=initialization)(z)
-    z = ApproxReLU(7,80)(z)
+    z = Dense(100, B=B_list[5], kernel_initializer=initialization)(z)
+    z = ApproxReLU(7, B_list[6])(z)
 
     y = Dense(num_classes, kernel_initializer=initialization)(z)
 
@@ -118,6 +122,46 @@ def cnn_4C3F(
     z = Activation(activation)(z)
     z = Dense(512, kernel_initializer=initialization)(z)
     z = z = Activation(activation)(z)
+
+    y = Dense(num_classes, kernel_initializer=initialization)(z)
+
+    return x, y
+
+
+def approx_cnn_4C3F(
+    input_shape,
+    num_classes,
+    initialization="orthogonal",
+):
+    x = Input(input_shape)
+
+    z = Conv2D(32, 3, padding="same", kernel_initializer=initialization)(x)
+    z = ApproxReLU(7, 2)(z)
+    z = Conv2D(
+        32,
+        4,
+        strides=2,
+        padding="same",
+        kernel_initializer=initialization,
+    )(z)
+    z = ApproxReLU(7, 2)(z)
+
+    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = ApproxReLU(7, 2)(z)
+    z = Conv2D(
+        64,
+        4,
+        strides=2,
+        padding="same",
+        kernel_initializer=initialization,
+    )(z)
+    z = ApproxReLU(7, 2)(z)
+
+    z = Flatten()(z)
+    z = Dense(512, kernel_initializer=initialization)(z)
+    z = ApproxReLU(7, 2)(z)
+    z = Dense(512, kernel_initializer=initialization)(z)
+    z = ApproxReLU(7, 2)(z)
 
     y = Dense(num_classes, kernel_initializer=initialization)(z)
 

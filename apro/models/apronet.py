@@ -14,7 +14,7 @@ class AproNet(GloroNet):
         _lc_frozen=False,
         _hardcoded_lc=1,
         _skip_init=False,
-        **kwargs
+        **kwargs,
     ):
         # Validate the provided parameters.
         if epsilon is None:
@@ -33,7 +33,7 @@ class AproNet(GloroNet):
             _lc_frozen=_lc_frozen,
             _hardcoded_lc=_hardcoded_lc,
             _skip_init=_skip_init,
-            **kwargs
+            **kwargs,
         )
         self._lipschitz_computers_inf = [lambda: 1.0] + [
             layer.lipschitz_inf for layer in model.layers[1:-1]
@@ -56,6 +56,10 @@ class AproNet(GloroNet):
         return error
 
     def compute_bound(self):
-        bound = (-1.0, 1.0)
+        B = 1
+        B_list = []
+        B_list.append(B)
         for layer in self.f.layers[1:-1]:
-            bound = layer.bound(bound)
+            B = layer.bound(B)
+            B_list.append(B.numpy())
+        return B_list

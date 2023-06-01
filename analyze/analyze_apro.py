@@ -30,6 +30,7 @@ from utils import get_data
 from utils import get_optimizer
 
 import os
+
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
 parent_dir_path = os.path.dirname(current_dir_path)
@@ -39,25 +40,19 @@ def analyze_apro(
     dataset,
     architecture,
     epsilon,
-    power_iterations=5,
-    epsilon_schedule="fixed",
     loss="crossentropy",
     augmentation="standard",
-    epochs=None,
     batch_size=None,
     optimizer="adam",
     lr=1e-3,
-    lr_schedule="fixed",
-    trades_schedule=None,
     verbose=True,
     load_from=None,
+    metadata=None,
 ):
     _print = print_if_verbose(verbose)
 
     # Load data and set up data pipeline.
     _print("loading data...")
-
-    train, test, metadata = get_data(dataset, batch_size, augmentation)
 
     input_shape = metadata.features["image"].shape
     num_classes = metadata.features["label"].num_classes
@@ -72,7 +67,6 @@ def analyze_apro(
         if "." in architecture:
             architecture, params = architecture.split(".", 1)
 
-        # TODO: here is where we should use `power_iterations`.
         architecture = getattr(architectures, architecture)(
             input_shape, num_classes, **json.loads(params)
         )
@@ -84,9 +78,6 @@ def analyze_apro(
 
     if verbose:
         g.summary()
-
-    # Compile and train the model.
-    _print("compiling model...")
 
     if load_from:
         load_from = parent_dir_path + load_from
