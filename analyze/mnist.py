@@ -10,6 +10,7 @@ def log_results(
     trained_epsilon,
     test,
     metadata,
+    a,
     dataset="mnist",
     batch_size=512,
     augmentation="standard",
@@ -33,7 +34,7 @@ def log_results(
 
     app_g = analyze_apro(
         dataset=dataset,
-        architecture=f'approx_{architecture}.{{"B_list":{B_list}}}',
+        architecture=f'approx_{architecture}.{{"a":{a}, "B_list":{B_list}}}',
         epsilon=epsilon,
         batch_size=batch_size,
         loss="sparse_trades_ce.1.2",
@@ -49,8 +50,9 @@ def log_results(
 
     # Write results to log file
     with open(log_file, "a") as f:
+        f.write(f"# alpha: {a}\n")
         f.write(
-            f"Architecture: {architecture}, Epsilon: {epsilon:.2f}, Trained Epsilon: {trained_epsilon}\n"
+            f"Architecture: {architecture}, Epsilon: {epsilon}, Trained Epsilon: {trained_epsilon}\n"
         )
         f.write(f"g_accuracy: {eval_result[1]:.4f}\n")
         f.write(f"g_vra: {eval_result[2]:.4f}\n")
@@ -63,10 +65,24 @@ def log_results(
 
 # List of epsilons and architectures
 epsilons = [
-    0.1,
+    1 / 255,
+    2 / 255,
+    3 / 255,
 ]
 trained_epsilons = [
-    (2, 0.1),
+    (0, 1 / 255),
+    (1, 2 / 255),
+    (2, 3 / 255),
+    (3, 4 / 255),
+    (4, 5 / 255),
+]
+a_list = [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
 ]
 architectures = ["cnn_2C2F"]
 
@@ -75,5 +91,7 @@ train, test, metadata = get_data("mnist", 512, "standard")
 # Loop through each combination of epsilon and architecture and log the results
 for architecture in architectures:
     for ei, trained_epsilon in trained_epsilons:
-        for epsilon in epsilons:
-            log_results(epsilon, architecture, ei, trained_epsilon, test, metadata)
+        for a in a_list:
+            log_results(
+                trained_epsilon, architecture, ei, trained_epsilon, test, metadata, a
+            )

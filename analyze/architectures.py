@@ -26,8 +26,6 @@ def cnn_2C2F(
     z = Conv2D(
         16,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(x)
     z = Activation(activation)(z)
@@ -35,8 +33,6 @@ def cnn_2C2F(
     z = Conv2D(
         32,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -54,6 +50,7 @@ def approx_cnn_2C2F(
     input_shape,
     num_classes,
     initialization="orthogonal",
+    a=7,
     B_list=[],
 ):
     x = Input(input_shape)
@@ -61,25 +58,21 @@ def approx_cnn_2C2F(
         16,
         4,
         B=B_list[0],
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(x)
-    z = ApproxReLU(7, B_list[1])(z)
+    z = ApproxReLU(a, B_list[1])(z)
 
     z = Conv2D(
         32,
         4,
         B=B_list[2],
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
-    z = ApproxReLU(7, B_list[3])(z)
+    z = ApproxReLU(a, B_list[3])(z)
 
     z = Flatten()(z)
     z = Dense(100, B=B_list[5], kernel_initializer=initialization)(z)
-    z = ApproxReLU(7, B_list[6])(z)
+    z = ApproxReLU(a, B_list[6])(z)
 
     y = Dense(num_classes, kernel_initializer=initialization)(z)
 
@@ -100,8 +93,6 @@ def cnn_4C3F(
     z = Conv2D(
         32,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -111,8 +102,6 @@ def cnn_4C3F(
     z = Conv2D(
         64,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -144,8 +133,6 @@ def approx_cnn_4C3F(
         32,
         4,
         B=B_list[2],
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = ApproxReLU(7, B_list[3])(z)
@@ -158,8 +145,6 @@ def approx_cnn_4C3F(
         64,
         4,
         B=B_list[6],
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = ApproxReLU(7, B_list[7])(z)
@@ -190,8 +175,6 @@ def cnn_6C2F(
     z = Conv2D(
         32,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -203,8 +186,6 @@ def cnn_6C2F(
     z = Conv2D(
         64,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -233,8 +214,6 @@ def cnn_8C2F(
     z = Conv2D(
         64,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -246,8 +225,6 @@ def cnn_8C2F(
     z = Conv2D(
         128,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -257,8 +234,6 @@ def cnn_8C2F(
     z = Conv2D(
         256,
         4,
-        strides=2,
-        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
