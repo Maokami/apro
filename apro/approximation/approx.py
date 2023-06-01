@@ -61,10 +61,10 @@ def sgn_approx(x, relu_dict):
 
     if tf.executing_eagerly():
         condition = tf.reduce_sum(tf.cast(tf.abs(x) > B, tf.int32)) != 0
+        max_val = tf.norm(x, ord=np.inf)
         if condition:
-            max_val = tf.norm(x, ord=np.inf)
-            # warnings.warn(f"ReLU : max_val ({max_val}) exceeds B ({B})")
-            raise rangeException("relu", max_val, B)
+            warnings.warn(f"ReLU : max_val ({max_val}) exceeds B ({B})")
+            # raise rangeException("relu", max_val, B)
 
     x = x / B
 

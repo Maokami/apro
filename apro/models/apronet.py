@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from gloro.models import GloroNet
 
 from tensorflow.keras.models import Model
@@ -48,6 +49,20 @@ class AproNet(GloroNet):
         return tf.reduce_prod(
             [lipschitz() for lipschitz in self._lipschitz_computers_inf]
         )
+
+    def _K_ij(self, k, j):
+        """
+        K_ij is the Lipschitz constant on the margin y_j - y_i.
+        """
+        kW = k * self.layers[-1].kernel
+
+        # Get the weight column of the predicted class.
+        kW_j = tf.gather(tf.transpose(kW), j)
+
+        # Get weights that predict the value y_j - y_i for all i != j.
+        kW_ij = kW_j[:, :, None] - kW[None]
+
+        return tf.norm(kW_ij, ord=np.inf, keepdims=False, axis=1)
 
     def compute_total_error(self, initial_error):
         error = initial_error

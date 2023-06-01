@@ -24,9 +24,9 @@ class Dense(GloroDense, AproLayer):
         super().__init__(*args, **kwargs)
 
     def call(self, inputs):
+        max_val = tf.norm(inputs, ord=np.inf)
         if self.B is not None:
             condition = tf.reduce_sum(tf.cast(tf.abs(inputs) > self.B, tf.int32)) != 0
-            max_val = tf.norm(inputs, ord=np.inf)
             tf.print(
                 tf.where(
                     condition,
@@ -38,7 +38,7 @@ class Dense(GloroDense, AproLayer):
 
     def lipschitz_inf(self):
         w = self.kernel
-        lc = tf.reduce_max(tf.reduce_sum(tf.abs(w), axis=1, keepdims=False))
+        lc = tf.reduce_max(tf.reduce_sum(tf.abs(w), axis=0, keepdims=False))
         return lc
 
     def propagate_error(self, error):
@@ -57,9 +57,9 @@ class Conv2D(GloroConv2D, AproLayer):
         super().__init__(*args, **kwargs)
 
     def call(self, inputs):
+        max_val = tf.norm(inputs, ord=np.inf)
         if self.B is not None:
             condition = tf.reduce_sum(tf.cast(tf.abs(inputs) > self.B, tf.int32)) != 0
-            max_val = tf.norm(inputs, ord=np.inf)
             tf.print(
                 tf.where(
                     condition,
@@ -127,6 +127,10 @@ class MaxPooling2D(GloroMaxPooling2D, AproLayer):
 
 
 class ReLU(GloroReLU, AproLayer):
+    def call(self, inputs):
+        max_val = tf.norm(inputs, ord=np.inf)
+        return super().call(inputs)
+
     def lipschitz_inf(self):
         return 1.0
 

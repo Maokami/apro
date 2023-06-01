@@ -23,12 +23,13 @@ def log_results(
         batch_size=batch_size,
         loss="sparse_trades_ce.1.2",
         augmentation=augmentation,
-        load_from=f"/pretrained_model/{dataset}/{dataset}_{architecture}_e{ei}.h5",
+        load_from=f"/pretrained_model/{dataset}2/{dataset}_{architecture}_e{ei}.h5",
         metadata=metadata,
     )
     eval_result = g.evaluate(test)
 
     B_list = g.compute_bound()
+    print(B_list)
 
     app_g = analyze_apro(
         dataset=dataset,
@@ -37,7 +38,7 @@ def log_results(
         batch_size=batch_size,
         loss="sparse_trades_ce.1.2",
         augmentation=augmentation,
-        load_from=f"/pretrained_model/{dataset}/{dataset}_{architecture.lower()}_e{ei}.h5",
+        load_from=f"/pretrained_model/{dataset}2/{dataset}_{architecture.lower()}_e{ei}.h5",
         metadata=metadata,
     )
     app_eval_result = app_g.evaluate(test)
@@ -62,15 +63,10 @@ def log_results(
 
 # List of epsilons and architectures
 epsilons = [
-    0.01,
-    0.05,
     0.1,
-    0.2,
-    0.3,
 ]
 trained_epsilons = [
-    (0, 0.01),
-    (1, 0.05),
+    (2, 0.1),
 ]
 architectures = ["cnn_2C2F"]
 
