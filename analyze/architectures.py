@@ -27,7 +27,7 @@ def cnn_2C2F(
         16,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(x)
     z = Activation(activation)(z)
@@ -36,7 +36,7 @@ def cnn_2C2F(
         32,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -62,7 +62,7 @@ def approx_cnn_2C2F(
         4,
         B=B_list[0],
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(x)
     z = ApproxReLU(7, B_list[1])(z)
@@ -72,7 +72,7 @@ def approx_cnn_2C2F(
         4,
         B=B_list[2],
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = ApproxReLU(7, B_list[3])(z)
@@ -95,24 +95,24 @@ def cnn_4C3F(
 ):
     x = Input(input_shape)
 
-    z = Conv2D(32, 3, padding="same", kernel_initializer=initialization)(x)
+    z = Conv2D(32, 3, padding="valid", kernel_initializer=initialization)(x)
     z = Activation(activation)(z)
     z = Conv2D(
         32,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
 
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         64,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -135,24 +135,24 @@ def approx_cnn_4C3F(
 ):
     x = Input(input_shape)
 
-    z = Conv2D(32, 3, padding="same", kernel_initializer=initialization)(x)
+    z = Conv2D(32, 3, padding="valid", kernel_initializer=initialization)(x)
     z = ApproxReLU(7, 2)(z)
     z = Conv2D(
         32,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = ApproxReLU(7, 2)(z)
 
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(z)
     z = ApproxReLU(7, 2)(z)
     z = Conv2D(
         64,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = ApproxReLU(7, 2)(z)
@@ -176,28 +176,28 @@ def cnn_6C2F(
 ):
     x = Input(input_shape)
 
-    z = Conv2D(32, 3, padding="same", kernel_initializer=initialization)(x)
+    z = Conv2D(32, 3, padding="valid", kernel_initializer=initialization)(x)
     z = Activation(activation)(z)
-    z = Conv2D(32, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(32, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         32,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
 
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         64,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -219,39 +219,39 @@ def cnn_8C2F(
 ):
     x = Input(input_shape)
 
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(x)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(x)
     z = Activation(activation)(z)
-    z = Conv2D(64, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(64, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         64,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
 
-    z = Conv2D(128, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(128, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
-    z = Conv2D(128, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(128, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         128,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
 
-    z = Conv2D(256, 3, padding="same", kernel_initializer=initialization)(z)
+    z = Conv2D(256, 3, padding="valid", kernel_initializer=initialization)(z)
     z = Activation(activation)(z)
     z = Conv2D(
         256,
         4,
         strides=2,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(z)
     z = Activation(activation)(z)
@@ -281,7 +281,7 @@ def _cnn_CxCC2F(
         backbone_width,
         5,
         strides=stem_downsample,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(x)
     z = Activation(activation)(z)
@@ -291,7 +291,7 @@ def _cnn_CxCC2F(
         z = Conv2D(
             backbone_width,
             3,
-            padding="same",
+            padding="valid",
             kernel_initializer=initialization,
         )(z)
         z = Activation(activation)(z)
@@ -351,7 +351,7 @@ def _liresnet_CxCC2F(
         backbone_width,
         5,
         strides=stem_downsample,
-        padding="same",
+        padding="valid",
         kernel_initializer=initialization,
     )(x)
     z = Activation(activation)(z)
