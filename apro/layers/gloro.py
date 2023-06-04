@@ -23,6 +23,9 @@ class Dense(GloroDense, AproLayer):
         self.B = B
         super().__init__(*args, **kwargs)
 
+    def set_B(self, B):
+        self.B = B
+
     def call(self, inputs):
         max_val = tf.norm(inputs, ord=np.inf)
         if self.B is not None:
@@ -55,6 +58,9 @@ class Conv2D(GloroConv2D, AproLayer):
     def __init__(self, *args, B=None, **kwargs):
         self.B = B
         super().__init__(*args, **kwargs)
+
+    def set_B(self, B):
+        self.B = B
 
     def call(self, inputs):
         max_val = tf.norm(inputs, ord=np.inf)
@@ -104,6 +110,13 @@ class AveragePooling2D(GloroAveragePooling2D, AproLayer):
 
 
 class Flatten(GloroFlatten, AproLayer):
+    def __init__(self, *args, B=None, **kwargs):
+        self.B = B
+        super().__init__(*args, **kwargs)
+
+    def set_B(self, B):
+        self.B = B
+
     def lipschitz_inf(self):
         return 1.0
 
@@ -127,6 +140,20 @@ class MaxPooling2D(GloroMaxPooling2D, AproLayer):
 
 
 class ReLU(GloroReLU, AproLayer):
+    def __init__(self, alpha, B=1, **kwargs):
+        self.alpha = alpha
+        self.B = B
+        self.range = (-B, B)
+
+        super().__init__(**kwargs)
+
+    def set_alpha(self, alpha):
+        self.alpha = alpha
+
+    def set_B(self, B):
+        self.B = B
+        self.range = (-B, B)
+
     def call(self, inputs):
         max_val = tf.norm(inputs, ord=np.inf)
         return super().call(inputs)
@@ -134,11 +161,15 @@ class ReLU(GloroReLU, AproLayer):
     def lipschitz_inf(self):
         return 1.0
 
+    def approx_error(self):
+        return 2 ** (-self.alpha) * self.B
+
     def propagate_error(self, error):
-        return error
+        return error + self.approx_error()
 
     def bound(self, input_B):
-        return input_B
+        self.set_B(input_B)
+        return input_B + self.approx_error()
 
 
 class ApproxReLU(KerasLambda, AproLayer):
@@ -174,4 +205,4 @@ class ApproxReLU(KerasLambda, AproLayer):
         return error + self.approx_error()
 
     def bound(self, input_B):
-        return input_B
+        return input_B + self.approx_error()

@@ -78,3 +78,7 @@ class AproNet(GloroNet):
             B = layer.bound(B)
             B_list.append(B.numpy())
         return B_list
+
+    def set_B(self, B_list):
+        for layer, B in zip(self.f.layers[1:-1], B_list):
+            layer.set_B(B)

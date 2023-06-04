@@ -5,6 +5,7 @@ import numpy as np
 
 import os
 import warnings
+import math
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
@@ -29,14 +30,14 @@ class rangeException(Exception):
 
 
 def poly_eval(x, coeff):
-    coeff = tf.constant(coeff, dtype=tf.float32)
+    coeff = tf.constant(coeff, dtype=tf.float64)
     if len(x.shape) == 2:
-        range_tensor = tf.range(tf.shape(coeff)[0], dtype=tf.float32)[None, None, :]
+        range_tensor = tf.range(tf.shape(coeff)[0], dtype=tf.float64)[None, None, :]
         x_expanded = tf.expand_dims(x, -1)
         result = x_expanded**range_tensor * coeff
         return tf.reduce_sum(result, axis=-1)
     elif len(x.shape) == 4:
-        range_tensor = tf.range(tf.shape(coeff)[0], dtype=tf.float32)[
+        range_tensor = tf.range(tf.shape(coeff)[0], dtype=tf.float64)[
             None, None, None, None, :
         ]
         x_expanded = tf.expand_dims(x, -1)
@@ -56,7 +57,7 @@ def sgn_approx(x, relu_dict):
     # Get coefficients
     f = open(coeff_dir + "/" + "coeff_" + str(alpha) + ".txt")
     coeffs_all_str = f.readlines()
-    coeffs_all = [np.float32(i) for i in coeffs_all_str]
+    coeffs_all = [np.float64(i) for i in coeffs_all_str]
     i = 0
 
     if tf.executing_eagerly():
@@ -65,7 +66,6 @@ def sgn_approx(x, relu_dict):
         if condition:
             warnings.warn(f"ReLU : max_val ({max_val}) exceeds B ({B})")
             # raise rangeException("relu", max_val, B)
-
     x = x / B
 
     for deg in comp_deg:
@@ -77,7 +77,22 @@ def sgn_approx(x, relu_dict):
 
 
 def ReLU_approx(x, relu_dict):
-    # tf.config.experimental_run_functions_eagerly(True)
-
+    x = tf.cast(x, dtype=tf.float64)
     sgnx = sgn_approx(x, relu_dict)
-    return x * (tf.constant(1.0, dtype=tf.float32) + sgnx) / 2
+    output = x * (tf.constant(1.0, dtype=tf.float64) + sgnx) / 2
+
+    condition = (
+        tf.reduce_sum(
+            tf.cast(tf.reduce_max(tf.abs(x)) < tf.reduce_max(tf.abs(output)), tf.int32)
+        )
+        != 0
+    )
+    tf.print(
+        tf.where(
+            condition,
+            f"ReLU_input : {tf.reduce_max(tf.abs(x))}\nReLU_output : {tf.reduce_max(tf.abs(output))}",
+            "",
+        )
+    )
+
+    return output
