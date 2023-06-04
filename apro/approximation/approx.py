@@ -81,18 +81,4 @@ def ReLU_approx(x, relu_dict):
     sgnx = sgn_approx(x, relu_dict)
     output = x * (tf.constant(1.0, dtype=tf.float64) + sgnx) / 2
 
-    condition = (
-        tf.reduce_sum(
-            tf.cast(tf.reduce_max(tf.abs(x)) < tf.reduce_max(tf.abs(output)), tf.int32)
-        )
-        != 0
-    )
-    tf.print(
-        tf.where(
-            condition,
-            f"ReLU_input : {tf.reduce_max(tf.abs(x))}\nReLU_output : {tf.reduce_max(tf.abs(output))}",
-            "",
-        )
-    )
-
     return output

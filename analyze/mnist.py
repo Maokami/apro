@@ -13,7 +13,7 @@ def log_results(
     dataset="mnist",
     batch_size=512,
     augmentation="standard",
-    log_file="mnist3.log",
+    log_file="mnist.log",
 ):
     tf.config.run_functions_eagerly(True)
     g = analyze_apro(
@@ -60,7 +60,7 @@ def log_results(
         # f.write(f"B_list: {B_list}\n")
         # f.write(f"total error: {total_error:.4f}\n\n")
         f.write(
-            f"{a}, {B_list}, {architecture}, {tolerance:.4f}, {total_error}, {eval_result[1]:.4f}, {eval_result[2]:.4f}, {app_eval_result[1]:.4f}, {app_eval_result[2]:.4f}\n"
+            f"{a}	{B_list}	{architecture}	{tolerance:.4f}	{total_error}	{eval_result[1]:.4f}	{eval_result[2]:.4f}	{app_eval_result[1]:.4f}	{app_eval_result[2]:.4f}\n"
         )
 
 
@@ -83,9 +83,10 @@ alphas = [
 architectures = ["cnn_2C2F"]
 
 train, test, metadata = get_data("mnist", 512, "standard")
+log_file = "mnist.log"
 
 # Loop through each combination of epsilon and architecture and log the results
 for architecture in architectures:
     for ei, epsilon in epsilons:
         for a in alphas:
-            log_results(epsilon, architecture, ei, test, metadata, a)
+            log_results(epsilon, architecture, ei, test, metadata, a, log_file=log_file)
