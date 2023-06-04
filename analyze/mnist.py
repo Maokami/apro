@@ -60,7 +60,7 @@ def log_results(
         # f.write(f"B_list: {B_list}\n")
         # f.write(f"total error: {total_error:.4f}\n\n")
         f.write(
-            f"{a}	{B_list}	{architecture}	{tolerance:.4f}	{total_error}	{eval_result[1]:.4f}	{eval_result[2]:.4f}	{app_eval_result[1]:.4f}	{app_eval_result[2]:.4f}\n"
+            f"{a}\t{B_list}\t{architecture}\t{tolerance:.4f}\t{total_error}\t{eval_result[1]:.4f}\t{eval_result[2]:.4f}\t{app_eval_result[1]:.4f}\t{app_eval_result[2]:.4f}\n"
         )
 
 
