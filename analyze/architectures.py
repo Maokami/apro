@@ -7,6 +7,8 @@ from apro.layers import ReLU
 from apro.layers import MaxPooling2D
 from apro.layers import ApproxReLU
 
+from tensorflow.keras.constraints import unit_norm
+
 
 def cnn_2C2F(
     input_shape,
@@ -113,12 +115,20 @@ def cnn_4C3F(
     z = ReLU(a)(z)
 
     z = Flatten()(z)
-    z = Dense(512, kernel_initializer=initialization)(z)
+    z = Dense(
+        512, kernel_initializer=initialization, kernel_constraint=unit_norm(axis=1)
+    )(z)
     z = ReLU(a)(z)
-    z = Dense(512, kernel_initializer=initialization)(z)
+    z = Dense(
+        512, kernel_initializer=initialization, kernel_constraint=unit_norm(axis=1)
+    )(z)
     z = ReLU(a)(z)
 
-    y = Dense(num_classes, kernel_initializer=initialization)(z)
+    y = Dense(
+        num_classes,
+        kernel_initializer=initialization,
+        kernel_constraint=unit_norm(axis=1),
+    )(z)
 
     return x, y
 
@@ -127,12 +137,13 @@ def approx_cnn_4C3F(
     input_shape,
     num_classes,
     initialization="orthogonal",
+    a=7,
     B_list=[],
 ):
     x = Input(input_shape)
 
     z = Conv2D(32, 3, B=B_list[0], padding="same", kernel_initializer=initialization)(x)
-    z = ApproxReLU(7, B_list[1])(z)
+    z = ApproxReLU(a, B_list[1])(z)
     z = Conv2D(
         32,
         4,
@@ -140,10 +151,10 @@ def approx_cnn_4C3F(
         B=B_list[2],
         kernel_initializer=initialization,
     )(z)
-    z = ApproxReLU(7, B_list[3])(z)
+    z = ApproxReLU(a, B_list[3])(z)
 
     z = Conv2D(64, 3, B=B_list[4], padding="same", kernel_initializer=initialization)(z)
-    z = ApproxReLU(7, B_list[5])(z)
+    z = ApproxReLU(a, B_list[5])(z)
     z = Conv2D(
         64,
         4,
@@ -151,13 +162,23 @@ def approx_cnn_4C3F(
         B=B_list[6],
         kernel_initializer=initialization,
     )(z)
-    z = ApproxReLU(7, B_list[7])(z)
+    z = ApproxReLU(a, B_list[7])(z)
 
     z = Flatten()(z)
-    z = Dense(512, B=B_list[9], kernel_initializer=initialization)(z)
-    z = ApproxReLU(7, B_list[10])(z)
-    z = Dense(512, B=B_list[11], kernel_initializer=initialization)(z)
-    z = ApproxReLU(7, B_list[12])(z)
+    z = Dense(
+        512,
+        B=B_list[9],
+        kernel_initializer=initialization,
+        kernel_constraint=unit_norm(axis=1),
+    )(z)
+    z = ApproxReLU(a, B_list[10])(z)
+    z = Dense(
+        512,
+        B=B_list[11],
+        kernel_initializer=initialization,
+        kernel_constraint=unit_norm(axis=1),
+    )(z)
+    z = ApproxReLU(a, B_list[12])(z)
 
     y = Dense(num_classes, kernel_initializer=initialization)(z)
 
